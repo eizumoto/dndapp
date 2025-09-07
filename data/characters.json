@@ -1,0 +1,94 @@
+{"characters": [{
+  "name": "Thalindra Moonshadow",
+  "class": "Rogue",
+  "race": "Half-Elf",
+  "level": 3,
+  "xp": 900,
+  "stats": {
+    "strength": 10,
+    "dexterity": 17,
+    "constitution": 13,
+    "intelligence": 14,
+    "wisdom": 12,
+    "charisma": 15
+  },
+  "health": 24,
+  "description": "Thalindra is a quick-witted half-elf rogue who grew up in the bustling streets of Waterdeep. Agile and charming, she makes her living as both a scout and a performer. She has a knack for slipping into places unseen and talking her way out of trouble. Her emerald eyes glimmer with mischief, and a silver pendant from her late mother is her most prized possession."
+},
+{
+  "name": "Brom Ironfist",
+  "class": "Cleric",
+  "race": "Dwarf",
+  "level": 4,
+  "xp": 2700,
+  "stats": {
+    "strength": 14,
+    "dexterity": 9,
+    "constitution": 16,
+    "intelligence": 11,
+    "wisdom": 17,
+    "charisma": 12
+  },
+  "health": 34,
+  "description": "Brom Ironfist is a stout and stalwart dwarven cleric of Moradin. With a voice like rolling thunder and a beard braided with silver rings, Brom brings both healing and righteous fury to his companions. He is deeply loyal, unshakably stubborn, and carries a heavy warhammer etched with his family crest."
+},
+{
+  "name": "Lyra Windwhisper",
+  "class": "Wizard",
+  "race": "Human",
+  "level": 2,
+  "xp": 450,
+  "stats": {
+    "strength": 8,
+    "dexterity": 13,
+    "constitution": 12,
+    "intelligence": 18,
+    "wisdom": 14,
+    "charisma": 10
+  },
+  "health": 15,
+  "description": "Lyra Windwhisper is a curious young wizard with an insatiable thirst for knowledge. Her long auburn hair is often tangled with quills and scraps of parchment tucked behind her ears. She is fascinated by the arcane mysteries of the world and sometimes gets so lost in her thoughts that she forgets to eat or sleep. Despite her absent-mindedness, Lyra’s sharp intellect makes her a valuable ally."
+}],
+"monsters":[
+  {
+    "kind": "Owlbear",
+    "stats": {
+      "strength": 20,
+      "dexterity": 12,
+      "constitution": 17,
+      "intelligence": 3,
+      "wisdom": 12,
+      "charisma": 7
+    },
+    "health": 59,
+    "description": "A hulking beast with the body of a bear and the head of a massive owl. The owlbear is known for its savage temperament and bone-chilling screeches that echo through the forest. Adventurers fear its crushing embrace and razor-sharp beak."
+  },
+  {
+    "kind": "Goblin",
+    "stats": {
+      "strength": 8,
+      "dexterity": 14,
+      "constitution": 10,
+      "intelligence": 10,
+      "wisdom": 8,
+      "charisma": 8
+    },
+    "health": 7,
+    "description": "Small, green-skinned humanoids with sharp teeth and a love for ambushes. Goblins thrive in numbers, often attacking from the shadows with crude weapons. While cowardly alone, they become dangerous in packs."
+  },
+  {
+    "kind": "Dragon Whelp",
+    "stats": {
+      "strength": 14,
+      "dexterity": 12,
+      "constitution": 13,
+      "intelligence": 10,
+      "wisdom": 11,
+      "charisma": 14
+    },
+    "health": 45,
+    "description": "A young dragon just learning to use its wings and elemental breath. Though not yet fully grown, a dragon whelp is fiercely territorial and can unleash devastating bursts of fire on those who intrude into its lair."
+  }
+]}
+
+

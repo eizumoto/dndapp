@@ -1,0 +1,16 @@
+version: "3"
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: npm run dev
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+      - ./data:/configs
+    ports:
+      - "3000:3000"
+    environment:
+      - MAP_CONFIG=/configs/map_10.json
+      - CHAR_CONFIG=/configs/characters.json
