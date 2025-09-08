@@ -2,6 +2,8 @@ dnd app
 
 Eddie Izumoto
 
+part one is located in dream_factory_design folder
+
 Important env vars:
 MAP_CONFIG : (REQUIRED) location of map config, I used ./data/map_10.json that I generated
 CHAR_CONFIG : (REQUIRED) location of character config, I used ./data/characters.json that I generated
