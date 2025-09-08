@@ -5,7 +5,7 @@ import { MapObject } from "../types/map";
 
 const characters: CharacterInput[] = charConfig.characters || [];
 
-let currentCharId = 10;
+export let currentCharId = 10;
 function getNextCharId(): number {
     if (currentCharId > 99) {
         throw new Error("Character ID limit reached (10–99). No more characters can be assigned.");
@@ -68,6 +68,22 @@ export function unspawnCharacter(entityId: number): Character {
     inactiveCharacters.push(charWithoutEntity);
 
     return char;
+}
+
+export function getCharacterCounter(): number{
+    return currentCharId;
+}
+
+export function loadCharacterState(state: {
+    active: ActiveCharacter[];
+    inactive: Character[]
+    currentId: number;
+}) {
+    currentCharId = state.currentId;
+    activeCharacters.length = 0;
+    activeCharacters.push(...state.active);
+    inactiveCharacters.length = 0;
+    inactiveCharacters.push(...state.inactive);
 }
 
 initializeCharacters(characters);

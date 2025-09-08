@@ -1,9 +1,11 @@
 import { Router, Request, Response } from "express";
-import { unspawnCharacter, activeCharacters } from "../state/characters";
-import { destoryMonster, spawnedMonsters } from "../state/monsters";
+import fs from "fs";
+import path from "path";
+import { unspawnCharacter, activeCharacters, inactiveCharacters, getCharacterCounter, loadCharacterState } from "../state/characters";
+import { destoryMonster, spawnedMonsters, availableMonsters, getMonsterCounter, loadMonsterState } from "../state/monsters";
 import { mapObjects, mapWidth, mapHeight, mapLocationOccupied, 
     findMapObjectByEntityId, removeMapObjectByEntityId,
-    checkObjectType } from "../state/mapState";
+    checkObjectType, getMapCounter, loadMapState } from "../state/mapState";
 
 const generalRouter = Router();
 
@@ -136,7 +138,88 @@ generalRouter.put("/replace", (req: Request, res: Response) => {
   });
 });
 
+generalRouter.post("/save", (req: Request, res: Response) => {
+    try {
+        let { filename } = req.body;
 
+        if (!filename) {
+            filename = "savegame";
+        }
 
+        if (!/^[a-zA-Z0-9]+$/.test(filename)) {
+            return res.status(400).json({ error: "Filename must be alphanumeric only." });
+        }
 
+        const state = {
+            map: {
+                width: mapWidth,
+                height: mapHeight,
+                objects: mapObjects,
+                currentId: getMapCounter()
+            },
+            monsters: {
+                available: availableMonsters,
+                spawned: spawnedMonsters,
+                currentId: getMonsterCounter()
+            },
+            characters: {
+                active: activeCharacters,
+                inactive: inactiveCharacters,
+                currentId: getCharacterCounter()
+            },
+        };
+
+        const savePath = path.resolve(`./data/${filename}.json`);
+        fs.writeFileSync(savePath, JSON.stringify(state, null, 2), "utf-8");
+
+        res.json({ message: "Game state saved successfully", path: savePath });
+
+    } catch (err) {
+        res.status(500).json({ error: (err as Error).message });
+    }
+
+});
+
+generalRouter.post("/load", (req: Request, res: Response) => {
+    try {
+        let { filename } = req.body;
+
+        if (!filename) {
+            return res.status(400).json({ error: "Filename is required." });
+        }
+
+        // Only allow alphanumeric
+        if (!/^[a-zA-Z0-9]+$/.test(filename)) {
+            return res.status(400).json({ error: "Filename must be alphanumeric only." });
+        }
+
+        const savePath = path.resolve(`./data/${filename}.json`);
+        if (!fs.existsSync(savePath)) {
+            return res.status(404).json({ error: "Save file not found." });
+        }
+        const raw = fs.readFileSync(savePath, "utf-8");
+        const state = JSON.parse(raw);
+
+        // Restore map
+
+        loadMapState(state.map);
+        
+        // Restore 
+        availableMonsters.length = 0;
+        availableMonsters.push(...state.monsters.available);
+
+        spawnedMonsters.length = 0;
+        spawnedMonsters.push(...state.monsters.spawned);
+
+        activeCharacters.length = 0;
+        activeCharacters.push(...state.characters.active);
+
+        inactiveCharacters.length = 0;
+        inactiveCharacters.push(...state.characters.inactive);
+
+        res.json({ message: "Game state loaded successfully", file: `${filename}.json` });
+    } catch (err) {
+        res.status(500).json({ error: (err as Error).message });
+    }
+});
 export default generalRouter;

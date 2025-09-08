@@ -29,3 +29,19 @@ export function destoryMonster(entityId: number): void{
 export function getMonsterByTypeId(typeId: number): Monster | undefined {
     return spawnedMonsters.find(m => m.type_id === typeId);
 }
+
+export function getMonsterCounter(): number{
+    return currentMonsterId;
+}
+
+export function loadMonsterState(state: {
+    available: Monster[];
+    spawned: SpawnedMonster[];
+    currentId: number;
+}) {
+    currentMonsterId = state.currentId;
+    availableMonsters.length = 0;
+    availableMonsters.push(...state.available);
+    spawnedMonsters.length = 0;
+    spawnedMonsters.push(...state.spawned);
+}

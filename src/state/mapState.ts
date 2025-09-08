@@ -1,8 +1,8 @@
 import { mapConfig } from "../config/config";
 import { MapObject } from "../types/map";
 
-export const mapHeight = mapConfig.height;
-export const mapWidth = mapConfig.width;
+export let mapHeight = mapConfig.height;
+export let mapWidth = mapConfig.width;
 
 export const mapObjects: MapObject[] = [];
 
@@ -25,6 +25,10 @@ for (let y = 0; y < mapGrid.length; y++) {
       currentMapObjectId++;
     }
   }
+}
+
+export function getMapCounter(): number{
+    return currentMapObjectId;
 }
 
 export function getObjectType(mapObject: MapObject): string {
@@ -109,4 +113,17 @@ export function checkObjectType(typeId: number): string{
     }
         // is a map object
     return "mapitem"
+}
+
+export function loadMapState(state: {
+  width: number;
+  height: number;
+  objects: MapObject[];
+  currentId: number;
+}) {
+    mapWidth = state.width;
+    mapHeight = state.height;
+    mapObjects.length = 0;
+    mapObjects.push(...state.objects);
+    currentMapObjectId = state.currentId;
 }
