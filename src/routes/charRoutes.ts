@@ -3,6 +3,7 @@ import { activeCharacters, inactiveCharacters, spawnCharacter } from "../state/c
 import { mapObjects, addMapObject, mapHeight, mapWidth, mapLocationOccupied } from "../state/mapState";
 import { availableMonsters, spawnedMonsters } from "../state/monsters";
 import { Stats } from "../types/common";
+import { charCache } from "../utils/cache";
 
 const charRouter = Router();
 
@@ -18,10 +19,18 @@ charRouter.get("/available", (_, res: Response) => {
 
 charRouter.get("/:entityId", (req: Request, res: Response) => {
     const entityId = Number(req.params.entityId);
+
+    const cached = charCache.get(entityId)
+    if (cached) {
+        console.log("read from cache");
+        return res.json(cached);
+    }
     const char = activeCharacters.find(c => c.entity_id === entityId);
     const monster = spawnedMonsters.find(c => c.entity_id === entityId);
 
     if (!char && !monster) return res.status(404).json({ error: "No Active entity found for entity id" });
+
+    charCache.set(entityId, char || monster);
 
     res.json(char || monster);
 });
@@ -75,11 +84,13 @@ charRouter.put("/", (req: Request, res: Response) => {
 
     if (charIndex !== -1) {
     activeCharacters[charIndex] = safeUpdate(activeCharacters[charIndex], updates);
+    charCache.set(entityId, activeCharacters[charIndex]);
     return res.json(activeCharacters[charIndex]);
   }
 
   if (monsterIndex !== -1) {
     spawnedMonsters[monsterIndex] = safeUpdate(spawnedMonsters[monsterIndex], updates);
+    charCache.set(entityId, spawnedMonsters[monsterIndex]);
     return res.json(spawnedMonsters[monsterIndex]);
   }
 });
