@@ -26,7 +26,7 @@ app.use("/api/character", charRouter);
 app.use("/api/", generalRouter);
 
 app.get("/", (req: Request, res: Response) => {
-    res.send("Hello World part 3");
+    res.send("dnd app is up");
 });
 
 if (require.main === module) {

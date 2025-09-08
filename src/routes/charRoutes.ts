@@ -7,15 +7,21 @@ import { charCache } from "../utils/cache";
 
 const charRouter = Router();
 
+// show active characters
+
 charRouter.get("/active", (_, res: Response) => {
     const charactersArray = Object.values(activeCharacters);
     res.json(charactersArray);
 });
 
+// show inactive characters (avaialble)
+
 charRouter.get("/available", (_, res: Response) => {
     const charactersArray = Object.values(inactiveCharacters);
     res.json(charactersArray);
 });
+
+// get character by entityId
 
 charRouter.get("/:entityId", (req: Request, res: Response) => {
     const entityId = Number(req.params.entityId);
@@ -35,6 +41,8 @@ charRouter.get("/:entityId", (req: Request, res: Response) => {
     res.json(char || monster);
 });
 
+// get character by typeId
+
 charRouter.get("/type/:typeId", (req: Request, res: Response) => {
     const typeId = Number(req.params.typeId);
     const char = activeCharacters.find(c => c.type_id === typeId);
@@ -46,8 +54,14 @@ charRouter.get("/type/:typeId", (req: Request, res: Response) => {
     res.json(char || inChar || monster);
 });
 
+
+interface UpdateRequest {
+    entityId: number;
+    updates: Record<string, any>;
+}
+
 charRouter.put("/", (req: Request, res: Response) => {
-    const { entityId, updates } = req.body;
+    const { entityId, updates } = req.body as UpdateRequest;
 
     if (typeof entityId !== "number" || typeof updates !== "object") {
         return res.status(400).json({ error: "Invalid request format" });
@@ -95,8 +109,15 @@ charRouter.put("/", (req: Request, res: Response) => {
   }
 });
 
+interface MoveRequest {
+    characterIndex: number;
+    x: number;
+    y: number;
+}
+
 charRouter.post("/", (req: Request, res: Response) => {
-    const { characterIndex, x, y } = req.body;
+    const { characterIndex, x, y } = req.body as MoveRequest;
+    // Check types for request
     if (
         typeof characterIndex !== "number" ||
         typeof x !== "number" ||
@@ -114,11 +135,7 @@ charRouter.post("/", (req: Request, res: Response) => {
         // Spawn the character (moves from inactive to active)
         const character = spawnCharacter(characterIndex, x, y);
 
-        return res.json({
-        characterId: character.entity_id,
-        x,
-        y,
-        });
+        return res.json({ characterId: character.entity_id, x, y });
     } catch (err: any) {
         return res.status(400).json({ error: err.message });
     }

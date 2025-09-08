@@ -1,17 +1,25 @@
 import { Router, Request, Response } from "express"
-import { getNextMonsterId, availableMonsters, spawnedMonsters } from "../state/monsters"
+import { availableMonsters, spawnedMonsters } from "../state/monsters"
 import { SpawnedMonster } from "../types/monster";
 import { addMapObject, mapHeight, mapWidth, mapLocationOccupied } from "../state/mapState";
-import { MapObject } from "../types/map";
 
 const monstRouter = Router();
+
+// get all spawned monsters
 
 monstRouter.get("/", (_, res: Response) => {
     res.json(spawnedMonsters);
 });
 
+//create monster
+
+interface CreateMonsterRequest {
+    x: number;
+    y: number;
+}
+
 monstRouter.post("/", (req: Request, res: Response) => {
-const { x, y } = req.body;
+const { x, y } = req.body as CreateMonsterRequest;
 
   // Validate coordinates
   if (
@@ -25,6 +33,7 @@ const { x, y } = req.body;
     return res.status(400).json({ error: "Invalid coordinates" });
   }
 
+  // Check map occupied
   if (mapLocationOccupied(x, y)) {
     return res.status(400).json({ error: "Location is already occupied" });
   }

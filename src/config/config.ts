@@ -27,8 +27,8 @@ export const mapConfig = loadJsonConfig<MapConfig>(mapConfigPath);
 
 // Validate immediately after loading
 validateMapConfig(mapConfig);
-console.log("Map config loaded and validated");
+console.log(`Map config loaded and validated at ${mapConfigPath}`);
 
 export const charConfig = loadJsonConfig<CharConfig>(process.env.CHAR_CONFIG || "");
 validateCharConfig(charConfig);
-console.log("Char config loaded and validated");
+console.log(`Char config loaded and validated at ${charConfigPath}`);

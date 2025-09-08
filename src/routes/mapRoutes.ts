@@ -4,6 +4,8 @@ import { mapObjects, mapWidth, mapHeight } from "../state/mapState";
 
 const mapRouter = Router();
 
+// print out map with typeIds
+
 mapRouter.get("/", (_, res: Response) => {
   // Initialize empty grid
   const grid = Array.from({ length: mapHeight }, () =>
@@ -18,6 +20,8 @@ mapRouter.get("/", (_, res: Response) => {
   res.json(grid);
 });
 
+// print out map with entityIds
+
 mapRouter.get("/entity", (_, res: Response) => {
   // Initialize empty grid
   const grid = Array.from({ length: mapHeight }, () =>
@@ -31,6 +35,8 @@ mapRouter.get("/entity", (_, res: Response) => {
 
   res.json(grid);
 });
+
+// print out list of entities on map
 
 mapRouter.get("/occupied", (_, res: Response) => {
     res.json(mapObjects)

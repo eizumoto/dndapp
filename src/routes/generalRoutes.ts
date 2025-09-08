@@ -6,54 +6,65 @@ import { destoryMonster, spawnedMonsters, availableMonsters, getMonsterCounter, 
 import { mapObjects, mapWidth, mapHeight, mapLocationOccupied, 
     findMapObjectByEntityId, removeMapObjectByEntityId,
     checkObjectType, getMapCounter, loadMapState } from "../state/mapState";
+import { GameState } from "../types/common";
 
 const generalRouter = Router();
 
 
+interface RemoveEntityRequest{
+    entityId: number;
+}
+
 generalRouter.delete("/entity", (req: Request, res: Response) => {
-  const { entityId } = req.body;
+    const { entityId } = req.body as RemoveEntityRequest;
 
-  if (typeof entityId !== "number") {
-    return res.status(400).json({ error: "Invalid or missing entityId" });
-  }
-
-  const mapObjIndex = mapObjects.findIndex(c => c.entity_id === entityId);
-
-  const mapObjectToDelete = mapObjects[mapObjIndex];
-  if (mapObjIndex === -1) {
-    return res.status(404).json({ error: "Entity not found in mapObjects" });
-  }
-
-  if (mapObjectToDelete.type_id in [0,1,2]) {
-    return res.status(400).json({ error: "Cannot delete static map object" });
-  }
-
-  mapObjects.splice(mapObjIndex,1);
-  const objectType = checkObjectType(mapObjectToDelete.type_id);
-
-  switch(objectType) {
-    case "monster":
-        destoryMonster(mapObjectToDelete.entity_id);
-        return res.json({message: "Monster deleted", entityId: mapObjectToDelete.entity_id, x: mapObjectToDelete.x, y: mapObjectToDelete.y});
-    case "character":
-        unspawnCharacter(mapObjectToDelete.entity_id);
-        return res.json({message: "Character deleted", entityId: mapObjectToDelete.entity_id, x: mapObjectToDelete.x, y: mapObjectToDelete.y});
-    case "mapitem":
-        return res.json({message: "Object deleted", entityId: mapObjectToDelete.entity_id, x: mapObjectToDelete.x, y: mapObjectToDelete.y});
+    // validate type
+    if (typeof entityId !== "number") {
+        return res.status(400).json({ error: "Invalid or missing entityId" });
     }
-  return res.status(404).json({ error: "Entity not found" });
+
+
+    // get mapObject by index
+    const mapObjIndex = mapObjects.findIndex(c => c.entity_id === entityId);
+
+    const mapObjectToDelete = mapObjects[mapObjIndex];
+    if (mapObjIndex === -1) {
+        return res.status(404).json({ error: "Entity not found in mapObjects" });
+    }
+
+    if (mapObjectToDelete.type_id in [0,1,2]) {
+        return res.status(400).json({ error: "Cannot delete static map object" });
+    }
+
+    // delete mapObject from entity map
+    mapObjects.splice(mapObjIndex,1);
+    // checks for type of object
+    const objectType = checkObjectType(mapObjectToDelete.type_id);
+
+    switch(objectType) {
+        case "monster":
+            destoryMonster(mapObjectToDelete.entity_id);
+            return res.json({message: "Monster deleted", entityId: mapObjectToDelete.entity_id, x: mapObjectToDelete.x, y: mapObjectToDelete.y});
+        case "character":
+            unspawnCharacter(mapObjectToDelete.entity_id);
+            return res.json({message: "Character deleted", entityId: mapObjectToDelete.entity_id, x: mapObjectToDelete.x, y: mapObjectToDelete.y});
+        case "mapitem":
+            return res.json({message: "Object deleted", entityId: mapObjectToDelete.entity_id, x: mapObjectToDelete.x, y: mapObjectToDelete.y});
+        }
+    return res.status(404).json({ error: "Entity not found" });
 });
 
 interface MoveRequest {
-  entityId: number;
-  entityType: "character" | "monster";
-  newX: number;
-  newY: number;
+    entityId: number;
+    entityType: "character" | "monster";
+    newX: number;
+    newY: number;
 }
-
 
 generalRouter.put("/move", (req: Request, res: Response) => {
     const { entityId, entityType, newX, newY } = req.body as MoveRequest;
+
+    // validation
     if (
         typeof entityId !== "number" ||
         (entityType !== "character" && entityType !== "monster") ||
@@ -71,6 +82,7 @@ generalRouter.put("/move", (req: Request, res: Response) => {
         return res.status(400).json({ error: "Location already occupied" });
     }
 
+    // get mapObject to move and update
     const entityObject = findMapObjectByEntityId(entityId)
     if (!entityObject) {
         return res.status(404).json({ error: "Entity not found in map to move"});
@@ -85,18 +97,19 @@ generalRouter.put("/move", (req: Request, res: Response) => {
     entityType,
     newX,
     newY
-  });
+});
 
 });
 
 interface ReplaceRequest {
-  attackerId: number;
-  targetId: number;
+    attackerId: number;
+    targetId: number;
 }
 
 generalRouter.put("/replace", (req: Request, res: Response) => {
     const { attackerId, targetId } = req.body as ReplaceRequest;
-
+    
+    // validation
     if (typeof attackerId !== "number" || typeof targetId !== "number") {
         return res.status(400).json({ error: "Invalid request payload" });
     }
@@ -108,6 +121,7 @@ generalRouter.put("/replace", (req: Request, res: Response) => {
         return res.status(404).json({ error: "Attacker or target not found on the map" });
     }
 
+    // check if adjacent
     const dx = Math.abs(attackerObj.x - targetObj.x);
     const dy = Math.abs(attackerObj.y - targetObj.y);
 
@@ -115,6 +129,7 @@ generalRouter.put("/replace", (req: Request, res: Response) => {
         return res.status(400).json({ error: "Attacker and target are not adjacent" });
     }
 
+    // Move attacker and destory target
     attackerObj.x = targetObj.x;
     attackerObj.y = targetObj.y;
 
@@ -138,10 +153,15 @@ generalRouter.put("/replace", (req: Request, res: Response) => {
   });
 });
 
+interface SaveRequest{
+    filename: string;
+}
+
 generalRouter.post("/save", (req: Request, res: Response) => {
     try {
-        let { filename } = req.body;
+        let { filename } = req.body as SaveRequest;
 
+        // validation
         if (!filename) {
             filename = "savegame";
         }
@@ -150,7 +170,8 @@ generalRouter.post("/save", (req: Request, res: Response) => {
             return res.status(400).json({ error: "Filename must be alphanumeric only." });
         }
 
-        const state = {
+        // generate game state
+        const state: GameState = {
             map: {
                 width: mapWidth,
                 height: mapHeight,
@@ -168,11 +189,11 @@ generalRouter.post("/save", (req: Request, res: Response) => {
                 currentId: getCharacterCounter()
             },
         };
-
+        // save game state to data dir
         const savePath = path.resolve(`./data/${filename}.json`);
         fs.writeFileSync(savePath, JSON.stringify(state, null, 2), "utf-8");
 
-        res.json({ message: "Game state saved successfully", path: savePath });
+        res.json({ message: "Game state saved successfully", path: savePath, filename: filename });
 
     } catch (err) {
         res.status(500).json({ error: (err as Error).message });
@@ -180,15 +201,21 @@ generalRouter.post("/save", (req: Request, res: Response) => {
 
 });
 
+interface LoadRequest{
+    filename: string;
+}
+
+
 generalRouter.post("/load", (req: Request, res: Response) => {
     try {
         let { filename } = req.body;
+
+        // validation
 
         if (!filename) {
             return res.status(400).json({ error: "Filename is required." });
         }
 
-        // Only allow alphanumeric
         if (!/^[a-zA-Z0-9]+$/.test(filename)) {
             return res.status(400).json({ error: "Filename must be alphanumeric only." });
         }
@@ -198,26 +225,19 @@ generalRouter.post("/load", (req: Request, res: Response) => {
             return res.status(404).json({ error: "Save file not found." });
         }
         const raw = fs.readFileSync(savePath, "utf-8");
-        const state = JSON.parse(raw);
+        const state = JSON.parse(raw) as GameState;
 
         // Restore map
 
         loadMapState(state.map);
         
-        // Restore 
-        availableMonsters.length = 0;
-        availableMonsters.push(...state.monsters.available);
+        // Restore monsters
+        loadMonsterState(state.monsters);
 
-        spawnedMonsters.length = 0;
-        spawnedMonsters.push(...state.monsters.spawned);
+        // restore characters
+        loadCharacterState(state.characters);
 
-        activeCharacters.length = 0;
-        activeCharacters.push(...state.characters.active);
-
-        inactiveCharacters.length = 0;
-        inactiveCharacters.push(...state.characters.inactive);
-
-        res.json({ message: "Game state loaded successfully", file: `${filename}.json` });
+        res.json({ message: "Game state loaded successfully", file: `${filename}` });
     } catch (err) {
         res.status(500).json({ error: (err as Error).message });
     }
