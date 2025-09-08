@@ -12,5 +12,9 @@ export interface CharacterInput {
 }
 
 export interface Character extends CharacterInput {
-    id: number;
+    type_id: number;
+}
+
+export interface ActiveCharacter extends Character {
+    entity_id: number;
 }

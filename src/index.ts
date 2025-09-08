@@ -4,10 +4,8 @@ import mapRouter from "./routes/mapRoutes"
 import monstRouter from "./routes/monsterRoutes";
 import charRouter from "./routes/charRoutes"
 
-const app = express();
+export const app = express();
 app.use(express.json());
-
-const PORT = process.env.PORT || 3000;
 
 app.use((req, _, next) => {
   console.log(`[${new Date().toISOString()}] Request Type: ${req.method} URL: ${req.url}`);
@@ -26,8 +24,7 @@ app.get("/", (req: Request, res: Response) => {
     res.send("Hello World part 3");
 });
 
-
-
-app.listen(PORT, () => {
-    console.log(`server running on port ${PORT}`);
-});
+if (require.main === module) {
+  const port = process.env.PORT || 3000;
+  app.listen(port, () => console.log(`Server running on port ${port}`));
+}

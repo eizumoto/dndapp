@@ -1,9 +1,6 @@
 import { charConfig } from "../config/config"
 import { Monster, SpawnedMonster } from "../types/monster";
 
-export const availableMonsters: Monster[] = charConfig.monsters || [];
-
-export const spawnedMonsters: SpawnedMonster[] = [];
 
 let currentMonsterId = 100; // Start at 100
 
@@ -13,3 +10,9 @@ export function getNextMonsterId(): number {
   }
   return currentMonsterId++;
 }
+
+export const availableMonsters: Monster[] = charConfig.monsters.map((monster) => ({
+    ...monster, type_id: getNextMonsterId()
+}));
+
+export const spawnedMonsters: SpawnedMonster[] = [];

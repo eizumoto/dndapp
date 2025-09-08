@@ -1,6 +1,8 @@
 import { Router, Request, Response } from "express"
 import { activeCharacters, inactiveCharacters, spawnCharacter } from "../state/characters"
 import { mapObjects, addMapObject, mapHeight, mapWidth, mapLocationOccupied } from "../state/mapState";
+import { availableMonsters, spawnedMonsters } from "../state/monsters";
+import { Stats } from "../types/common";
 
 const charRouter = Router();
 
@@ -14,12 +16,72 @@ charRouter.get("/available", (_, res: Response) => {
     res.json(charactersArray);
 });
 
-charRouter.get("/:entityId", (_, res: Response) => {
-    res.json({"dummy":"response"})
+charRouter.get("/:entityId", (req: Request, res: Response) => {
+    const entityId = Number(req.params.entityId);
+    const char = activeCharacters.find(c => c.entity_id === entityId);
+    const monster = spawnedMonsters.find(c => c.entity_id === entityId);
+
+    if (!char && !monster) return res.status(404).json({ error: "No Active entity found for entity id" });
+
+    res.json(char || monster);
+});
+
+charRouter.get("/type/:typeId", (req: Request, res: Response) => {
+    const typeId = Number(req.params.typeId);
+    const char = activeCharacters.find(c => c.type_id === typeId);
+    const inChar =  inactiveCharacters.find(c => c.type_id === typeId);
+    const monster = availableMonsters.find(c => c.type_id === typeId);
+
+    if (!char && !inChar && !monster) return res.status(404).json({ error: "Character not found by type id" });
+
+    res.json(char || inChar || monster);
 });
 
 charRouter.put("/", (req: Request, res: Response) => {
-    res.json({"dummy":"response"})
+    const { entityId, updates } = req.body;
+
+    if (typeof entityId !== "number" || typeof updates !== "object") {
+        return res.status(400).json({ error: "Invalid request format" });
+    }
+
+    const charIndex = activeCharacters.findIndex(c => c.entity_id === entityId);
+    const monsterIndex = spawnedMonsters.findIndex(m => m.entity_id === entityId);
+
+    if (charIndex === -1 && monsterIndex === -1) {
+        return res.status(404).json({ error: "Active unit not found" });
+    }
+
+    interface HasStats {
+        stats: Stats;
+        [key: string]: any; // allows other fields
+}
+
+    function safeUpdate<T extends HasStats>(original: T, updates: Partial<T>): T {
+        const updated: T = { ...original };
+        for (const key in updates) {
+            if (key in original && key !== "entity_id" && key !== "type_id") {
+                if (key === "stats" && typeof updates.stats === "object") {
+                    updated.stats = { ...original.stats, ...updates.stats };
+                } else {
+                    (updated as any)[key] = (updates as any)[key];
+                }
+            }
+        }
+        return updated;
+    }
+
+
+    //const { entity_id, type_id, ...safeUpdates } = updates as any;
+
+    if (charIndex !== -1) {
+    activeCharacters[charIndex] = safeUpdate(activeCharacters[charIndex], updates);
+    return res.json(activeCharacters[charIndex]);
+  }
+
+  if (monsterIndex !== -1) {
+    spawnedMonsters[monsterIndex] = safeUpdate(spawnedMonsters[monsterIndex], updates);
+    return res.json(spawnedMonsters[monsterIndex]);
+  }
 });
 
 charRouter.post("/", (req: Request, res: Response) => {
@@ -39,13 +101,10 @@ charRouter.post("/", (req: Request, res: Response) => {
 
     try {
         // Spawn the character (moves from inactive to active)
-        const character = spawnCharacter(characterIndex);
-
-        // Add to mapObjects
-        addMapObject(character.id, x, y); // type = 10-99 for characters
+        const character = spawnCharacter(characterIndex, x, y);
 
         return res.json({
-        characterId: character.id,
+        characterId: character.entity_id,
         x,
         y,
         });

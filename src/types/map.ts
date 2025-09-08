@@ -1,6 +1,6 @@
 export interface MapObject {
-    id: number;
-    type: number;
+    entity_id: number;
+    type_id: number;
     x: number;
     y: number;
 }

@@ -4,29 +4,32 @@ import { MapObject } from "../types/map";
 export const mapHeight = mapConfig.height;
 export const mapWidth = mapConfig.width;
 
-export const mapObjects: Record<number, MapObject> = {};
+export const mapObjects: MapObject[] = [];
 
 export let mapGrid = JSON.parse(JSON.stringify(mapConfig.grid));
-let currentId = 1;
+
+let currentMapObjectId = 1;
 
 for (let y = 0; y < mapGrid.length; y++) {
   for (let x = 0; x < mapGrid[y].length; x++) {
     const cellValue = mapGrid[y][x];
     if (cellValue !== 0) {
-      mapObjects[currentId] = {
-        id: currentId,
-        type: cellValue,
+      const obj: MapObject = {
+        entity_id: currentMapObjectId,
+        type_id: cellValue,
         x,
         y
       };
-      currentId++;
+
+      mapObjects.push(obj);
+      currentMapObjectId++;
     }
   }
 }
 
 export function getObjectType(mapObject: MapObject): string {
-    const { type } = mapObject;
-    switch(type){
+    const { type_id } = mapObject;
+    switch(type_id){
         case 0:
             return "empty";
         case 1:
@@ -40,34 +43,34 @@ export function getObjectType(mapObject: MapObject): string {
         case 5:
             return "wall";
         default:
-            if (type >= 10 && type <= 99) {
+            if (type_id >= 10 && type_id <= 99) {
                 return "character"
             }
-            if (type>= 100 && type <= 999){
+            if (type_id>= 100 && type_id <= 999){
                 return "monster"
             }
-        throw new Error(`Type value ${type} out of bounds`);
+        throw new Error(`type_id value ${type_id} out of bounds`);
     }
 }
 
-export function addMapObject(type: number, x: number, y: number): MapObject {
+export function addMapObject(type_id: number, x: number, y: number): MapObject {
   // Validate coordinates
   if (x < 0 || y < 0 || x >= mapWidth || y >= mapHeight) {
     throw new Error(`Invalid coordinates (${x},${y})`);
   }
 
   const newObject: MapObject = {
-    id: currentId++,
-    type,
+    entity_id: currentMapObjectId++,
+    type_id,
     x,
     y,
   };
 
   // Update mapObjects dictionary
-  mapObjects[newObject.id] = newObject;
+  mapObjects.push(newObject);
 
   // Update mapGrid
-  mapGrid[y][x] = type;
+  mapGrid[y][x] = type_id;
 
   return newObject;
 }

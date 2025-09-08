@@ -1,7 +1,8 @@
 import { Router, Request, Response } from "express"
 import { getNextMonsterId, availableMonsters, spawnedMonsters } from "../state/monsters"
 import { SpawnedMonster } from "../types/monster";
-import { mapObjects, addMapObject, mapHeight, mapWidth, mapLocationOccupied } from "../state/mapState";
+import { addMapObject, mapHeight, mapWidth, mapLocationOccupied } from "../state/mapState";
+import { MapObject } from "../types/map";
 
 const monstRouter = Router();
 
@@ -32,20 +33,19 @@ const { x, y } = req.body;
   const template = availableMonsters[Math.floor(Math.random() * availableMonsters.length)];
   if (!template) return res.status(404).json({ error: "No monsters available" });
 
-  const monsterId = getNextMonsterId();
+  const monsterId = template.type_id;
+  const mapObject = addMapObject(monsterId, x, y);
   const monster: SpawnedMonster = {
     ...template,
     stats: { ...template.stats },
-    id: monsterId
+    entity_id: mapObject.entity_id
   };
 
   // Add to spawned monsters
   spawnedMonsters.push(monster);
+  
 
-  // Update map grid
-  addMapObject(monsterId, x, y);
-
-  res.json({"monsterId": monsterId, "x": x, "y": y});
+  res.json({"monsterId": mapObject.entity_id, "x": x, "y": y});
 });
 
 

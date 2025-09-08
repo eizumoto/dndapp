@@ -12,7 +12,7 @@ mapRouter.get("/", (_, res: Response) => {
 
   // Fill grid from mapObjects
   for (const obj of Object.values(mapObjects)) {
-    grid[obj.y][obj.x] = obj.type;
+    grid[obj.y][obj.x] = obj.type_id;
   }
 
   res.json(grid);

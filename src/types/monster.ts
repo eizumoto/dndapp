@@ -5,8 +5,9 @@ export interface Monster {
   stats: Stats
   health: number;
   description: string;
+  type_id: number
 }
 
 export interface SpawnedMonster extends Monster {
-    id: number;
+    entity_id: number;
 }
