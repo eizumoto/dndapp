@@ -27,6 +27,26 @@ docker build -t dndapp
 
 docker run -e MAP_CONFIG=./data/map_10.json -e CHAR_CONFIG=./data/characters.json dndapp
 
+Save and load Endpoints
+
+/api/save POST
+
+{
+"filename":<savefile>
+}
+
+Will save file to <savefile>.json on local filesystem
+
+/api/load POST
+
+{
+"filename":<loadfile>
+}
+
+Will load file from <loadfile>.json on local filesystem
+
+File types must be AlphaNumeric only
+
 Note: I added 3 additional endpoints to help handle the way entityId had to be handled.
 
 GET /api/map/entity
