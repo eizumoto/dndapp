@@ -32,4 +32,8 @@ mapRouter.get("/entity", (_, res: Response) => {
   res.json(grid);
 });
 
+mapRouter.get("/occupied", (_, res: Response) => {
+    res.json(mapObjects)
+});
+
 export default mapRouter;
