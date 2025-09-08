@@ -18,4 +18,18 @@ mapRouter.get("/", (_, res: Response) => {
   res.json(grid);
 });
 
+mapRouter.get("/entity", (_, res: Response) => {
+  // Initialize empty grid
+  const grid = Array.from({ length: mapHeight }, () =>
+    Array(mapWidth).fill(0)
+  );
+
+  // Fill grid from mapObjects
+  for (const obj of Object.values(mapObjects)) {
+    grid[obj.y][obj.x] = obj.entity_id;
+  }
+
+  res.json(grid);
+});
+
 export default mapRouter;

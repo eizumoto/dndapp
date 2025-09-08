@@ -42,7 +42,7 @@ describe("Monster API", () => {
       // Ensure mapObjects updated
       const found = Object.values(mapObjects).find(obj => obj.x === 1 && obj.y === 1);
       expect(found).toBeDefined();
-      expect(found!.type_id).toBe(res.body.monsterId);
+      expect(found!.entity_id).toBe(res.body.monsterId);
     });
 
     it("returns 400 when location is occupied", async () => {

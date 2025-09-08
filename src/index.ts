@@ -1,8 +1,9 @@
 import express, { Request, Response } from "express";
-import diceRouter from "./routes/diceRoutes"
-import mapRouter from "./routes/mapRoutes"
+import diceRouter from "./routes/diceRoutes";
+import mapRouter from "./routes/mapRoutes";
 import monstRouter from "./routes/monsterRoutes";
-import charRouter from "./routes/charRoutes"
+import charRouter from "./routes/charRoutes";
+import generalRouter from "./routes/generalRoutes";
 
 export const app = express();
 app.use(express.json());
@@ -12,6 +13,8 @@ app.use((req, _, next) => {
   next();
 });
 
+
+
 app.use("/api/dice", diceRouter);
 
 app.use("/api/map", mapRouter);
@@ -19,6 +22,8 @@ app.use("/api/map", mapRouter);
 app.use("/api/monster", monstRouter);
 
 app.use("/api/character", charRouter);
+
+app.use("/api/", generalRouter);
 
 app.get("/", (req: Request, res: Response) => {
     res.send("Hello World part 3");

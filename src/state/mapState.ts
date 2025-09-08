@@ -82,3 +82,31 @@ export function mapLocationOccupied(x: number, y: number): boolean{
     }
     return false
 }
+
+export function findMapObjectByEntityId(entityId: number): MapObject | undefined{
+    const mapObject = mapObjects.find((c) => c.entity_id === entityId)
+
+    return mapObject
+}
+
+export function removeMapObjectByEntityId(entityId: number): void{
+    const mapObjectIndex = mapObjects.findIndex((c) => c.entity_id === entityId)
+    if (mapObjectIndex !== -1) {
+        mapObjects.splice(mapObjectIndex, 1);
+    }
+
+}
+
+export function checkObjectType(typeId: number): string{
+    if (typeId >= 100) {
+        // is a monster
+        return "monster";
+    }  
+        // is a character
+    if (typeId >= 10) {
+        // is a monster
+        return "character";
+    }
+        // is a map object
+    return "mapitem"
+}

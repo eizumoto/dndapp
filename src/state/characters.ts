@@ -32,17 +32,17 @@ function initializeCharacters(inactiveJson: CharacterInput[]) {
     inactiveCharacters = loadCharacters(inactiveJson);
 }
 
-export function spawnCharacter(id: number, x: number, y: number): ActiveCharacter {
-    const index = inactiveCharacters.findIndex((c) => c.type_id === id);
+export function spawnCharacter(typeId: number, x: number, y: number): ActiveCharacter {
+    const index = inactiveCharacters.findIndex((c) => c.type_id === typeId);
     if (index === -1) {
-        throw new Error(`Character with type_id ${id} not found in inactiveCharacters.`);
+        throw new Error(`Character with type_id ${typeId} not found in inactiveCharacters.`);
     }
     const char = inactiveCharacters[index];
 
     if (!char) {
-        throw new Error(`Character with id ${id} not found in inactiveCharacters.`);
+        throw new Error(`Character with id ${typeId} not found in inactiveCharacters.`);
     }
-    const newCharMapInfo: MapObject = addMapObject(id, x, y);
+    const newCharMapInfo: MapObject = addMapObject(typeId, x, y);
     // Move character to activeCharacters
     const newChar: ActiveCharacter = {
         entity_id: newCharMapInfo.entity_id,
@@ -54,10 +54,10 @@ export function spawnCharacter(id: number, x: number, y: number): ActiveCharacte
     return newChar;
 }
 
-export function unspawnCharacter(id: number): Character {
-    const index = activeCharacters.findIndex((c) => c.entity_id === id);
+export function unspawnCharacter(entityId: number): Character {
+    const index = activeCharacters.findIndex((c) => c.entity_id === entityId);
     if (index === -1) {
-        throw new Error(`Character with entity_id ${id} not found in activeCharacters.`);
+        throw new Error(`Character with entity_id ${entityId} not found in activeCharacters.`);
     }
 
     const char = activeCharacters[index];

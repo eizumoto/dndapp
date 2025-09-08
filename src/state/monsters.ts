@@ -1,3 +1,4 @@
+import { spawn } from "child_process";
 import { charConfig } from "../config/config"
 import { Monster, SpawnedMonster } from "../types/monster";
 
@@ -16,3 +17,15 @@ export const availableMonsters: Monster[] = charConfig.monsters.map((monster) =>
 }));
 
 export const spawnedMonsters: SpawnedMonster[] = [];
+
+export function destoryMonster(entityId: number): void{
+    const monsterIndex = spawnedMonsters.findIndex(c => c.entity_id === entityId);
+    if (monsterIndex !== -1) {
+        spawnedMonsters.splice(monsterIndex, 1);
+    }
+    
+}
+
+export function getMonsterByTypeId(typeId: number): Monster | undefined {
+    return spawnedMonsters.find(m => m.type_id === typeId);
+}
